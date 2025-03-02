@@ -1,0 +1,89 @@
+{
+	"common": {
+		"name": "wallboxamo",
+		"version": "0.0.1",
+		"news": {
+			"0.0.1": {
+				"en": "initial release",
+				"de": "Erstveröffentlichung",
+				"ru": "Начальная версия",
+				"pt": "lançamento inicial",
+				"nl": "Eerste uitgave",
+				"fr": "Première version",
+				"it": "Versione iniziale",
+				"es": "Versión inicial",
+				"pl": "Pierwsze wydanie",
+				"uk": "Початкова версія",
+				"zh-cn": "首次出版"
+			}
+		},
+		"titleLang": {
+			"en": "WallboxAMO",
+			"de": "WallboxAMO",
+			"ru": "WallboxAMO",
+			"pt": "WallboxAMO",
+			"nl": "WallboxAMO",
+			"fr": "WallboxAMO",
+			"it": "WallboxAMO",
+			"es": "WallboxAMO",
+			"pl": "WallboxAMO",
+			"uk": "WallboxAMO",
+			"zh-cn": "WallboxAMO"
+		},
+		"desc": {
+			"en": "WallboxAMO",
+			"de": "WallboxAMO",
+			"ru": "WallboxAMO",
+			"pt": "WallboxAMO",
+			"nl": "WallboxAMO",
+			"fr": "WallboxAMO",
+			"it": "WallboxAMO",
+			"es": "WallboxAMO",
+			"pl": "WallboxAMO",
+			"uk": "WallboxAMO",
+			"zh-cn": "WallboxAMO"
+		},
+		"authors": [
+			"Patrick-Walther <walther-patrick@gmx.net>"
+		],
+		"keywords": [
+			"Wallbox",
+			"ABL",
+			"Modbus ASCII"
+		],
+		"licenseInformation": {
+			"type": "free",
+			"license": "MIT"
+		},
+		"platform": "Javascript/Node.js",
+		"icon": "wallboxamo.png",
+		"enabled": true,
+		"extIcon": "https://raw.githubusercontent.com/Patrick-Walther/ioBroker.wallboxamo/main/admin/wallboxamo.png",
+		"readme": "https://github.com/Patrick-Walther/ioBroker.wallboxamo/blob/main/README.md",
+		"loglevel": "info",
+		"tier": 3,
+		"mode": "daemon",
+		"type": "vehicle",
+		"compact": true,
+		"connectionType": "local",
+		"dataSource": "poll",
+		"adminUI": {
+			"config": "json"
+		},
+		"dependencies": [
+			{
+				"js-controller": ">=6.0.11"
+			}
+		],
+		"globalDependencies": [
+			{
+				"admin": "7.0.23"
+			}
+		]
+	},
+	"native": {
+		"COM Port": ""
+	},
+	"objects": [],
+	"instanceObjects": []
+}

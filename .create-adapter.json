@@ -1,0 +1,45 @@
+{
+	"expert": "no",
+	"cli": false,
+	"adapterName": "wallboxamo",
+	"title": "WallboxAMO",
+	"description": "WallboxAMO",
+	"keywords": [
+		"Wallbox",
+		"ABL",
+		"Modbus ASCII"
+	],
+	"contributors": "",
+	"authorName": "Patrick-Walther",
+	"authorGithub": "Patrick-Walther",
+	"authorEmail": "walther-patrick@gmx.net",
+	"features": [
+		"adapter"
+	],
+	"adminFeatures": [],
+	"type": "vehicle",
+	"startMode": "daemon",
+	"connectionType": "local",
+	"dataSource": "poll",
+	"connectionIndicator": "no",
+	"adapterSettings": [
+		{
+			"key": "COM Port",
+			"inputType": "text",
+			"defaultValue": ""
+		}
+	],
+	"language": "JavaScript",
+	"adminUi": "json",
+	"releaseScript": "yes",
+	"indentation": "Tab",
+	"quotes": "single",
+	"tools": [
+		"ESLint",
+		"type checking",
+		"devcontainer"
+	],
+	"license": "MIT License",
+	"target": "github",
+	"creatorVersion": "2.6.5"
+}
