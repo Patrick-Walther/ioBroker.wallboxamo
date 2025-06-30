@@ -171,6 +171,7 @@ class Wallboxamo extends utils.Adapter {
 	SendSerial(AdresseSerialOut) {
 		const a = AdresseSerialOut;
 		this.log.info("SendSerial _a: " + a);
+		this.func_setintervall();
 	}
 
 	//If you need to accept messages in your adapter, uncomment the following block and the corresponding line in the constructor.
