@@ -17,11 +17,12 @@
 Bitte schließen Sie ein Netzwerkkabel an die untere RJ45 Buchse an.
 
 ![cable_place](/docs/img/cable_place.png)
+
 **Wichtig** Prüfen Sie, welche TIA Belegung am Netzwerkkabel verwendet wird.
 
 ![tia](/docs/img/Netzwerk%20TIA%20Belegung.png)
 
-Am Wavesshare:
+**Am Wavesshare:**
 
 <table>
   <thead>
