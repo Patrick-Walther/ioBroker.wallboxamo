@@ -15,7 +15,7 @@
     "wallbox",
     "ecar",
     "e-auto",
-       "iobroker"
+    "iobroker"
   ],
   "repository": {
     "type": "git",
