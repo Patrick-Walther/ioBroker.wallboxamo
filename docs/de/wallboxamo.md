@@ -15,9 +15,9 @@
 > Die Anleitung ist gültig für Version 0.0.1
 
 Bitte schließen Sie ein Netzwerkkabel an die untere RJ45 Buchse an.
-![cable_place](/docs/img/cable_place.png | width=50)
+![cable_place](/docs/img/cable_place.png = 250x250)
 **Wichtig** Prüfen Sie, welche TIA Belegung am Netzwerkkabel verwendet wird.
-![tia](/docs/img/Netzwerk TIA Belegung.png)
+![tia](/docs/img/Netzwerk%20TIA%20Belegung.png)
 
 Am Wavesshare:
 
@@ -31,11 +31,11 @@ Am Wavesshare:
   <tbody>
     <tr>
       <td>A</td>
-      <td>B</td>
+      <td>A(Grün-Weiß) / B(Grün)</td>
     </tr>
     <tr>
-      <td>A(Grün-Weiß) / B(Grün)</td>
-      <td>A(Orange-Weiß) / B(Orange)</td>
+      <td>B</td>
+      <td>B(Orange-Weiß) / B(Orange)</td>
     </tr>
   </tbody>
 </table>
