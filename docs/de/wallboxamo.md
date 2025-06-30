@@ -15,9 +15,9 @@
 > Die Anleitung ist gültig für Version 0.0.1
 
 Bitte schließen Sie ein Netzwerkkabel an die untere RJ45 Buchse an.
-![cable_place](img/cable_place.PNG)
+![cable_place](/docs/img/cable_place.png)
 **Wichtig** Prüfen Sie, welche TIA Belegung am Netzwerkkabel verwendet wird.
-![tia](img/Netzwerk TIA Belegung.PNG)
+![tia](/docs/img/Netzwerk TIA Belegung.PNG)
 
 Am Wavesshare:
 
