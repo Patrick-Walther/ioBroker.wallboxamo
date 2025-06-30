@@ -44,7 +44,7 @@
 			"zh-cn": "Wallboxamo"
 		},
 		"authors": ["patrick-walther <walther-patrick@gmx.net>"],
-		"keywords": ["ioBroker", "iobroker", "modbus", "modbus-ascii", "wallbox", "ecar", "e-auto"],
+		"keywords": ["ioBroker", "modbus", "modbus-ascii", "wallbox", "ecar", "e-auto", "iobroker"],
 		"licenseInformation": {
 			"type": "free",
 			"license": "MIT"

@@ -9,13 +9,13 @@
   "homepage": "https://github.com/Patrick-Walther/ioBroker.wallboxamo",
   "license": "MIT",
   "keywords": [
-    "iobroker",
     "ioBroker",
     "modbus",
     "modbus ascii",
     "wallbox",
     "ecar",
-    "e-auto"
+    "e-auto",
+       "iobroker"
   ],
   "repository": {
     "type": "git",
