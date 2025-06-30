@@ -170,7 +170,7 @@ class Wallboxamo extends utils.Adapter {
 
 	SendSerial(AdresseSerialOut) {
 		const a = AdresseSerialOut;
-		this.log.info("SendSerial _a: " + a);
+		this.log.info("SendSerial _a: " + a + " func_setintervall");
 		this.func_setintervall();
 	}
 
