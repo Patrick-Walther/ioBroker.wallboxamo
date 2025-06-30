@@ -1,0 +1,146 @@
+<html>
+	<head>
+		<!-- Load ioBroker scripts and styles-->
+		<link rel="stylesheet" type="text/css" href="../../css/adapter.css" />
+		<link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css" />
+
+		<script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
+		<script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+
+		<script type="text/javascript" src="../../js/translate.js"></script>
+		<script type="text/javascript" src="../../lib/js/materialize.js"></script>
+		<script type="text/javascript" src="../../js/adapter-settings.js"></script>
+
+		<!-- Load our own files -->
+		<link rel="stylesheet" type="text/css" href="style.css" />
+		<script type="text/javascript" src="words.js"></script>
+
+		<script type="text/javascript">
+			var timeout;
+			var count = 0;
+
+			function getComPorts(actualValue) {
+				count++;
+				if (count > 10) return;
+
+				timeout = setTimeout(function () {
+					getComPorts(actualValue);
+				}, 2000);
+
+				sendTo(null, "listUart", null, function (list) {
+					if (timeout) {
+						clearTimeout(timeout);
+						timeout = null;
+					}
+					if (!list) {
+						setTimeout(function () {
+							getComPorts(actualValue);
+						}, 1000);
+						return;
+					}
+					var $serialport = $("#serialport");
+					var text = list.length
+						? '<option value="">' + _("Select port") + "</option>"
+						: '<option value="">' + _("No ports found") + "</option>";
+					for (var j = 0; j < list.length; j++) {
+						if (list[j].path === "Not available") {
+							text += '<option value="" selected>' + _("Not available") + "</option>";
+							$serialport.prop("disabled", true);
+							break;
+						} else {
+							text +=
+								'<option value="' +
+								list[j].path +
+								'" ' +
+								(actualValue === list[j].path ? "selected" : "") +
+								">" +
+								list[j].path +
+								"</option>";
+						}
+					}
+					$serialport.html(text).select();
+				});
+			}
+
+			// This will be called by the admin adapter when the settings page loads
+			function load(settings, onChange) {
+				// example: select elements with id=key and class=value and insert value
+				if (!settings) return;
+				$(".value").each(function () {
+					var $key = $(this);
+					var id = $key.attr("id");
+					if ($key.attr("type") === "checkbox") {
+						// do not call onChange direct, because onChange could expect some arguments
+						$key.prop("checked", settings[id]).on("change", () => onChange());
+					} else {
+						// do not call onChange direct, because onChange could expect some arguments
+						$key.val(settings[id])
+							.on("change", () => onChange())
+							.on("keyup", () => onChange());
+					}
+				});
+
+				getIsAdapterAlive(function (isAlive) {
+					if (isAlive || common.enabled) {
+						getComPorts(settings.serialport);
+					} else {
+						var $select = $("#serialport").find("select");
+						$select.select("destroy");
+						$select.replaceWith('<input id="serialport" class="value" value="' + serialport + '"/>');
+						$("#serialport").on("change", onChange).on("keyup", onChange);
+						M.updateTextFields();
+					}
+				});
+
+				onChange(false);
+				// reinitialize all the Materialize labels on the page if you are dynamically adding inputs:
+				if (M) M.updateTextFields();
+			}
+
+			// This will be called by the admin adapter when the user presses the save button
+			function save(callback) {
+				// example: select elements with class=value and build settings object
+				var obj = {};
+				$(".value").each(function () {
+					var $this = $(this);
+					if ($this.attr("type") === "checkbox") {
+						obj[$this.attr("id")] = $this.prop("checked");
+					} else if ($this.attr("type") === "number") {
+						obj[$this.attr("id")] = parseFloat($this.val());
+					} else {
+						obj[$this.attr("id")] = $this.val();
+					}
+				});
+				callback(obj);
+			}
+		</script>
+	</head>
+
+	<body>
+		<div class="m adapter-container">
+			<div class="row">
+				<div class="col s4 m4 l2">
+					<img src="wallboxamo.png" class="logo" />
+				</div>
+			</div>
+
+			<div class="row"><br /></div>
+
+			<div class="row">
+				<div class="row">
+					<div class="col s12 m4" id="conf_interval">
+						<select id="conf_interval" class="value"></select>
+						<label class="translate" for="conf_serialport">Serialport:</label>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col s4 m4 input-field">
+						<input type="number" class="value" min="1" max="200" id="conf_interval" />
+						<label for="conf_interval" class="translate">Intveral[s]:</label>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
