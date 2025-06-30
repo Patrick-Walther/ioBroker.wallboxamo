@@ -9,6 +9,7 @@
   "homepage": "https://github.com/Patrick-Walther/ioBroker.wallboxamo",
   "license": "MIT",
   "keywords": [
+    "iobroker",
     "ioBroker",
     "modbus",
     "modbus ascii",
