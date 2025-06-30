@@ -9,10 +9,11 @@
   "homepage": "https://github.com/Patrick-Walther/ioBroker.wallboxamo",
   "license": "MIT",
   "keywords": [
-    "ioBroker",
-    "template",
-    "Smart Home",
-    "home automation"
+    "modbus",
+    "modbus ascii",
+    "wallbox",
+    "ecar",
+    "e-auto"
   ],
   "repository": {
     "type": "git",
