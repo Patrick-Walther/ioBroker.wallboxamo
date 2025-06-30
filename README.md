@@ -32,7 +32,7 @@ So far I can recommend this one [“Waveshare Industrial USB to RS485 ”](https
 
 ### **WORK IN PROGRESS**
 
-## 0.0.1
+### 0.0.1
 
 - (patrick-walther) initial release
 
