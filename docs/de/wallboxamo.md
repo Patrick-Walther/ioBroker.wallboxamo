@@ -22,7 +22,7 @@ Bitte schließen Sie ein Netzwerkkabel an die untere RJ45 Buchse an.
 
 ![tia](/docs/img/Netzwerk%20TIA%20Belegung.png)
 
-**Am Wavesshare:**
+**Am Waveshare:**
 
 <table>
   <thead>

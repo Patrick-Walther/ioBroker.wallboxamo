@@ -1,0 +1,10 @@
+{
+	"configurations": [
+		{
+			"type": "chrome",
+			"name": "http://192.168.168.14:8081",
+			"request": "launch",
+			"url": "http://192.168.168.14:8081"
+		}
+	]
+}

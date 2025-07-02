@@ -15,9 +15,12 @@
 > The instructions are valid for version 0.0.1
 
 Please connect a network cable to the lower RJ45 socket.
-![Image](img/1718282573205.jpg)
+
+![cable_place](/docs/img/cable_place.png)
+
 **Important** Check which TIA assignment is used on the network cable.
-![Image](img/Network TIA Assignment.PNG)
+
+![tia](/docs/img/Netzwerk%20TIA%20Belegung.png)
 
 On the Wavesshare:
 
@@ -31,13 +34,11 @@ On the Wavesshare:
   <tbody>
     <tr>
       <td>A</td>
-      <td>B</td>
+      <td>A(Grün-Weiß) / B(Grün)</td>
     </tr>
     <tr>
-      <td>A(Grün-Weiß) / B(Grün)</td>
-      <td>A(Orange-Weiß) / B(Orange)</td>
+      <td>B</td>
+      <td>B(Orange-Weiß) / B(Orange)</td>
     </tr>
   </tbody>
 </table>
-
-Translated with DeepL.com (free version)

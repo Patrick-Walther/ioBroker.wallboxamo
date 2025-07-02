@@ -1,15 +1,17 @@
 <html>
 	<head>
-		<!-- Load ioBroker scripts and styles-->
-		<link rel="stylesheet" type="text/css" href="../../css/adapter.css" />
+		<!-- these 4 files always have to be included -->
 		<link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css" />
+		<link rel="stylesheet" type="text/css" href="../../css/adapter.css" />
 
 		<script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
 		<script type="text/javascript" src="../../socket.io/socket.io.js"></script>
 
+		<!-- these files always have to be included -->
 		<script type="text/javascript" src="../../js/translate.js"></script>
 		<script type="text/javascript" src="../../lib/js/materialize.js"></script>
 		<script type="text/javascript" src="../../js/adapter-settings.js"></script>
+		<script type="text/javascript" src="words.js"></script>
 
 		<!-- Load our own files -->
 		<link rel="stylesheet" type="text/css" href="style.css" />
@@ -105,8 +107,6 @@
 					var $this = $(this);
 					if ($this.attr("type") === "checkbox") {
 						obj[$this.attr("id")] = $this.prop("checked");
-					} else if ($this.attr("type") === "number") {
-						obj[$this.attr("id")] = parseFloat($this.val());
 					} else {
 						obj[$this.attr("id")] = $this.val();
 					}
@@ -129,15 +129,15 @@
 			<div class="row">
 				<div class="row">
 					<div class="col s12 m4" id="conf_interval">
-						<select id="conf_interval" class="value"></select>
-						<label class="translate" for="conf_serialport">Serialport:</label>
+						<select id="serialport" class="value"></select>
+						<label class="translate" for="serialport">Serialport:</label>
 					</div>
 				</div>
 
 				<div class="row">
 					<div class="col s4 m4 input-field">
-						<input type="number" class="value" min="1" max="200" id="conf_interval" />
-						<label for="conf_interval" class="translate">Intveral[s]:</label>
+						<input type="number" class="value" id="conf_interval" />
+						<label for="conf_interval" class="translate">Intveral:</label>
 					</div>
 				</div>
 			</div>

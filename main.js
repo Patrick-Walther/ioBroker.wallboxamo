@@ -8,9 +8,11 @@
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core");
 const adapterName = require("./package.json").name.split(".").pop();
+const { SerialPort } = require("serialport");
+const { DelimiterParser } = require("@serialport/parser-delimiter");
 // Load your modules here, e.g.:
 // const fs = require("fs");
-
+let fs;
 class Wallboxamo extends utils.Adapter {
 	/**
 	 * @param {Partial<utils.AdapterOptions>} [options={}]
@@ -62,19 +64,55 @@ class Wallboxamo extends utils.Adapter {
 	 */
 	async onReady() {
 		// Initialize your adapter here
+		this.setState("info.connection", true, true);
 
 		this.subscribeStates("send.current");
 		this.subscribeStates("send.reset");
 		this.subscribeStates("send.locked");
 		this.subscribeStates("send.unlock");
 
-		this.setState("info.connection", true, true);
+		SerialPort.list()
+			.then((ports) => {
+				const raw_ports = ports;
+				const JSON_raw = raw_ports[0];
+				const JSON_path = JSON_raw.path;
+				this.log.info("jsonraw: " + JSON.stringify(JSON_raw));
+				//const JSON_serialnumber = JSON_raw.serialNumber;
+				this.log.info("serialpath: " + JSON_path);
+				//this.log.info("JSON_serialnumber: " + JSON_serialnumber);
+				//this.setState("usb.serialnumber", JSON_serialnumber.toString(), true);
+			})
+			.catch((_err) => {
+				this.log.warn("Error getting serialport list");
+			});
+
 		this.log.info("[START] Starting wallboxamo adapter");
 		this.log.info("Config timer	: " + this.config.conf_interval);
 		this.NIntervallStatus = this.config.conf_interval;
 
 		await this.set_objects();
 		this.func_setintervall();
+	}
+
+	writeserialinfo(insert) {
+		try {
+			const raw_ports = insert[0];
+			const JSON_path = JSON.stringify(raw_ports.path);
+			const JSON_productId = JSON.stringify(raw_ports.productId);
+			const JSON_vendorId = JSON.stringify(raw_ports.vendorId);
+			//const JSON_serialNumber = JSON.stringify(raw_ports.device);
+
+			this.log.info(
+				"Json_Path: " + JSON_path + " Json_Product ID: " + JSON_productId + " Json_vendor ID: " + JSON_vendorId,
+			);
+
+			this.setState("device-usb.raw", JSON.stringify(raw_ports), true);
+			this.setState("device-usb.port", JSON_path, true);
+			this.setState("device-usb.vendorId", JSON_vendorId, true);
+			this.setState("device-usb.productId", JSON_productId, true);
+		} catch (err) {
+			this.log.error("error1: " + err);
+		}
 	}
 
 	func_setintervall() {
@@ -129,7 +167,7 @@ class Wallboxamo extends utils.Adapter {
 					const BCheckCurrentAnswer = this.ACommandSetting[IACommandSettingRow][3];
 
 					//ACommandSetting
-					//this.ACurrentSetting fgh
+					//this.ACurrentSetting
 
 					switch (id_value) {
 						case "current":
@@ -174,7 +212,7 @@ class Wallboxamo extends utils.Adapter {
 		this.func_setintervall();
 	}
 
-	//If you need to accept messages in your adapter, uncomment the following block and the corresponding line in the constructor.
+	//If you need to accept messages in your adapter, uncomment the following block and the corresponding line in the constructor.p
 	/**
 	 * Some message was sent to this instance over message box. Used by email, pushover, text2speech, ...
 	 * Using this method requires "common.messagebox" property to be set to true in io-package.json
@@ -183,13 +221,14 @@ class Wallboxamo extends utils.Adapter {
 	onMessage(obj) {
 		if (obj) {
 			this.log.debug("object list uart");
-			/*	switch (obj.command) {
+			switch (obj.command) {
 				case "listUart":
 					if (obj.callback) {
 						if (SerialPort) {
 							// read all found serial ports
 							SerialPort.list().then((ports) => {
 								this.writeserialinfo(ports);
+								ports = this.listSerial(ports);
 								this.log.debug(`List of port: ${JSON.stringify(ports)}`);
 								this.log.info("Usb-Stick found");
 								this.sendTo(obj.from, obj.command, ports, obj.callback);
@@ -199,10 +238,57 @@ class Wallboxamo extends utils.Adapter {
 							this.sendTo(obj.from, obj.command, [{ path: "Not available" }], obj.callback);
 						}
 					}
-					break;*/
+					break;
+			}
 		}
 	}
-	//}
+
+	listSerial(ports) {
+		ports = ports || [];
+		const path = require("node:path");
+		fs = fs || require("node:fs");
+
+		// Filter out the devices that aren"t serial ports
+		const devDirName = "/dev";
+
+		let result;
+		try {
+			this.log.info(`Verify ${JSON.stringify(ports)}`);
+			result = fs
+				.readdirSync(devDirName)
+				.map((file) => path.join(devDirName, file))
+				.filter(this.filterSerialPorts)
+				.map((port) => {
+					let found = false;
+					for (let v = 0; v < ports.length; v++) {
+						if (ports[v].path === port) {
+							found = true;
+							break;
+						}
+					}
+					this.log.info(`Check ${port} : ${found}`);
+
+					!found && ports.push({ path: port });
+
+					return { path: port };
+				});
+		} catch (e) {
+			if (require("node:os").platform() !== "win32") {
+				this.log.error(`Cannot read "${devDirName}": ${e}`);
+			}
+			result = ports;
+		}
+		return result;
+	}
+
+	filterSerialPorts(path) {
+		fs = fs || require("node:fs");
+		// get only serial port names
+		if (!/(tty(S|ACM|USB|AMA|MFD|XR)|rfcomm)/.test(path)) {
+			return false;
+		}
+		return fs.statSync(path).isCharacterDevice();
+	}
 
 	set_objects() {
 		try {
@@ -230,6 +316,7 @@ class Wallboxamo extends utils.Adapter {
 					},
 					read: true,
 					write: false,
+					def: false,
 				},
 				native: {},
 			});
