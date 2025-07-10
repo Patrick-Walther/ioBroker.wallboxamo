@@ -10,9 +10,11 @@ const utils = require("@iobroker/adapter-core");
 const adapterName = require("./package.json").name.split(".").pop();
 const { SerialPort } = require("serialport");
 const { DelimiterParser } = require("@serialport/parser-delimiter");
+//const { InterByteTimeoutParser } = require("@serialport/parser-inter-byte-timeout");
 // Load your modules here, e.g.:
 // const fs = require("fs");
 let fs;
+
 class Wallboxamo extends utils.Adapter {
 	/**
 	 * @param {Partial<utils.AdapterOptions>} [options={}]
@@ -63,35 +65,94 @@ class Wallboxamo extends utils.Adapter {
 	 * Is called when databases are connected and adapter received configuration.
 	 */
 	async onReady() {
-		// Initialize your adapter here
-		this.setState("info.connection", true, true);
+		try {
+			// Initialize your adapter here
+			this.setState("info.connection", true, true);
 
-		this.subscribeStates("send.current");
-		this.subscribeStates("send.reset");
-		this.subscribeStates("send.locked");
-		this.subscribeStates("send.unlock");
+			this.subscribeStates("send.current");
+			this.subscribeStates("send.reset");
+			this.subscribeStates("send.locked");
+			this.subscribeStates("send.unlock");
 
-		SerialPort.list()
-			.then((ports) => {
-				const raw_ports = ports;
-				const JSON_raw = raw_ports[0];
-				const JSON_path = JSON_raw.path;
-				this.log.info("jsonraw: " + JSON.stringify(JSON_raw));
-				//const JSON_serialnumber = JSON_raw.serialNumber;
-				this.log.info("serialpath: " + JSON_path);
-				//this.log.info("JSON_serialnumber: " + JSON_serialnumber);
-				//this.setState("usb.serialnumber", JSON_serialnumber.toString(), true);
-			})
-			.catch((_err) => {
-				this.log.warn("Error getting serialport list");
+			SerialPort.list()
+				.then((ports) => {
+					const raw_ports = ports;
+					const JSON_raw = raw_ports[0];
+					const JSON_path = JSON_raw.path;
+					this.log.info("jsonraw: " + JSON.stringify(JSON_raw));
+					const JSON_serialnumber = JSON_raw.serialNumber;
+					this.log.info("serialpath: " + JSON_path);
+					this.log.info("JSON_serialnumber: " + JSON_serialnumber);
+					if (JSON_serialnumber && JSON_serialnumber !== "null") {
+						this.setState("device-usb.serialnumber", JSON_serialnumber.toString(), true);
+					}
+				})
+				.catch((_err) => {
+					this.log.warn("Error getting serialport list");
+				});
+
+			/*this.port.open(function (err) { //test
+				console.error(err);
+				this.port.close(() => {
+				this.log.error("Error opening serial port: " + err);
+
+				this.port_open = false;
+			});*/
+
+			this.port = new SerialPort({
+				path: this.config.serialport,
+				baudRate: 38400,
+				dataBits: 8,
+				parity: "even",
+				stopBits: 1,
+				autoOpen: false,
 			});
+
+			this.port.open(function (err) {
+				if (err) {
+					console.error("Error opening port: ", err.message);
+					return;
+				}
+			});
+
+			this.port.on("open", () => {
+				this.log.info("Serial port opened successfully");
+				this.setState("device-usb.port-open", true, true);
+				this.setState("info.connection", true, true);
+			});
+		} catch (error) {
+			this.log.error("Error initializing serial port: " + error);
+			this.setState("device-usb.port-open", false, true);
+			this.setState("info.connection", false, true);
+		}
 
 		this.log.info("[START] Starting wallboxamo adapter");
 		this.log.info("Config timer	: " + this.config.conf_interval);
-		this.NIntervallStatus = this.config.conf_interval;
 
 		await this.set_objects();
-		this.func_setintervall();
+		if (this.port?.isOpen) {
+			await this.func_setintervall();
+		}
+	}
+
+	func_setintervall() {
+		const intervall_status = this.config.conf_interval * 1000;
+
+		this.abl_watchdog_status = setInterval(async () => {
+			this.log.debug("timer");
+			this.log.debug("port isOpen: " + this.port?.isOpen);
+			this.port?.write(":01100005000102A1A1A5\r\n");
+			this.log.info("Sent command to serial port: :0103002E0005C9\r\n");
+			this.parser = this.port?.pipe(new DelimiterParser({ delimiter: "\r\n" }));
+			this.func_answer();
+		}, intervall_status);
+	}
+
+	func_answer() {
+		this.parser?.on("data", (data) => {
+			this.log.info("Received data: " + data.toString());
+			this.setState("device-usb.raw2", data.toString(), true);
+		});
 	}
 
 	writeserialinfo(insert) {
@@ -100,7 +161,6 @@ class Wallboxamo extends utils.Adapter {
 			const JSON_path = JSON.stringify(raw_ports.path);
 			const JSON_productId = JSON.stringify(raw_ports.productId);
 			const JSON_vendorId = JSON.stringify(raw_ports.vendorId);
-			//const JSON_serialNumber = JSON.stringify(raw_ports.device);
 
 			this.log.info(
 				"Json_Path: " + JSON_path + " Json_Product ID: " + JSON_productId + " Json_vendor ID: " + JSON_vendorId,
@@ -112,19 +172,6 @@ class Wallboxamo extends utils.Adapter {
 			this.setState("device-usb.productId", JSON_productId, true);
 		} catch (err) {
 			this.log.error("error1: " + err);
-		}
-	}
-
-	func_setintervall() {
-		try {
-			this.NIntervallStatus = this.config.conf_interval * 1000;
-			if (this.NIntervallStatus > 0 || this.NIntervallStatus < 60) {
-				this.abl_watchdog_status = this.setInterval(async () => {
-					this.log.debug("timer");
-				}, this.NIntervallStatus);
-			}
-		} catch (error) {
-			this.log.info("error: " + error);
 		}
 	}
 
@@ -190,7 +237,7 @@ class Wallboxamo extends utils.Adapter {
 							}
 							break;
 						default:
-							this.func_setintervall();
+							//his.func_setintervall();
 							this.log.info("Timer status: " + BTimer);
 							this.log.info("BCheckCurrentAnswer: " + BCheckCurrentAnswer);
 					}
@@ -209,7 +256,7 @@ class Wallboxamo extends utils.Adapter {
 	SendSerial(AdresseSerialOut) {
 		const a = AdresseSerialOut;
 		this.log.info("SendSerial _a: " + a + " func_setintervall");
-		this.func_setintervall();
+		//this.func_setintervall();
 	}
 
 	//If you need to accept messages in your adapter, uncomment the following block and the corresponding line in the constructor.p
@@ -321,6 +368,23 @@ class Wallboxamo extends utils.Adapter {
 				native: {},
 			});
 
+			this.setObjectNotExistsAsync("device-usb.serialnumber", {
+				type: "state",
+				common: {
+					name: "device-usb.serialnumber",
+					type: "string",
+					role: "info.serialbnumber",
+					desc: {
+						en: "Provides information about the port serialnumber.",
+						de: "Gibt Informationen über den genutzen usb serialnumber.",
+					},
+					read: true,
+					write: false,
+					def: "",
+				},
+				native: {},
+			});
+
 			this.setObjectNotExistsAsync("device-usb.port-open", {
 				type: "state",
 				common: {
@@ -338,6 +402,21 @@ class Wallboxamo extends utils.Adapter {
 			});
 
 			this.setObjectNotExistsAsync("device-usb.raw", {
+				type: "state",
+				common: {
+					name: "port",
+					type: "string",
+					role: "JSON",
+					desc: {
+						en: "Gives information about the raw data of the USB device",
+						de: "Gibt Information über die Rohdaten des Usb Gerät",
+					},
+					read: true,
+					write: false,
+				},
+				native: {},
+			});
+			this.setObjectNotExistsAsync("device-usb.raw2", {
 				type: "state",
 				common: {
 					name: "port",
